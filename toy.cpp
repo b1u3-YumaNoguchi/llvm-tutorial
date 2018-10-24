@@ -181,6 +181,7 @@ static std::unique_ptr<ExprAST> ParseIdentifierExpr() {
 						getNextToken();
 				}
 		}
+		getNextToken();
 		return llvm::make_unique<CallExprAST>(IdName, std::move(Args));
 }
 
@@ -222,7 +223,7 @@ static std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,std::unique_ptr<ExprA
 		}
 }
 
-static std::unique_ptr<ExprAST> ParseExpressin(){
+static std::unique_ptr<ExprAST> ParseExpression(){
 
 		auto LHS = ParsePrimary();
 		if (!LHS)
@@ -314,6 +315,7 @@ static void MainLoop() {
 								break;
 						case tok_def:
 								HandleDefinition();
+								break;
 						case tok_extern:
 								HandleExtern();
 								break;
