@@ -1,6 +1,6 @@
 #include "llvm/ADT/STLExtras.h"
 #include <algorithm>
-#include <ccypte>
+#include <cctype>
 #include <cstdio>
 #include <map>
 #include <memory>
@@ -11,11 +11,11 @@
  * Lexer
  */
 enum Token {
-		tok_eof = -1;
-		tok_def = -2;
-		tok_extern = -3;
-		tok_identifier = -4;
-		tok_number = -5;
+		tok_eof = -1,
+		tok_def = -2,
+		tok_extern = -3,
+		tok_identifier = -4,
+		tok_number = -5,
 };
 
 static std::string IdentifierStr;
@@ -95,7 +95,7 @@ namespace {
 				CallExprAST(const std::string &Callee,std::vector<std::unique_ptr<ExprAST>> Args):Callee(Callee),Args(std::move(Args)){}
 		};
 		class PrototypeAST{
-				std::string Nmae;
+				std::string Name;
 				std::vector<std::string> Args;
 				public:
 				PrototypeAST(const std::string &Name, std::vector<std::string> Args):Name(Name),Args(std::move(Args)){}
@@ -147,10 +147,11 @@ static std::unique_ptr<ExprAST> ParseNumberExpr() {
 		auto Result = llvm::make_unique<NumberExprAST>(NumVal);
 		getNextToken();
 		return std::move(Result);
+}
 
 static std::unique_ptr<ExprAST> ParseParenExpr() {
 		getNextToken();
-		auto V = parseExpression();
+		auto V = ParseExpression();
 		if (!V)
 				return nullptr;
 		if (CurTok != ')')
@@ -162,7 +163,7 @@ static std::unique_ptr<ExprAST> ParseParenExpr() {
 static std::unique_ptr<ExprAST> ParseIdentifierExpr() {
 		std::string IdName = IdentifierStr;
 		getNextToken();
-		if (CurTok != = '(')
+		if (CurTok != '(')
 				return llvm::make_unique<VariableExprAST>(IdName);
 
 		getNextToken();
@@ -187,8 +188,8 @@ static std::unique_ptr<ExprAST> ParsePrimary() {
 		switch(CurTok) {
 				default:
 						return LogError("unknown token when expecting an expression");
-				case tok_identfier:
-						return ParseIdetifierExpr();
+				case tok_identifier:
+						return ParseIdentifierExpr();
 				case tok_number:
 						return ParseNumberExpr();
 				case '(':
@@ -279,7 +280,7 @@ static std::unique_ptr<PrototypeAST> ParseExtern() {
  */
 				
 static void HandleDefinition() {
-		if(parseDefinition()){
+		if(ParseDefinition()){
 				fprintf(stderr,"Parsed a function definition.\n");
 		}else{
 				getNextToken();
@@ -295,7 +296,7 @@ static void HandleExtern() {
 }
 
 static void HandleTopLevelExpression(){
-		if(parseTopLevelExpr()){
+		if(ParseTopLevelExpr()){
 				fprintf(stderr,"Parsed a top-level expr\n");
 		}else{
 				getNextToken();
